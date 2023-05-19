@@ -162,6 +162,7 @@ class VariantMapper(object):
                 edit_n.type == "ins"
                 and pos_n.start.offset == 0
                 and pos_n.end.offset == 0
+                and pos_n.end.datum == pos_n.start.datum
                 and pos_n.end - pos_n.start > 1
             ):
                 pos_n.start.base += 1
@@ -244,6 +245,7 @@ class VariantMapper(object):
                 edit_c.type == "ins"
                 and pos_c.start.offset == 0
                 and pos_c.end.offset == 0
+                and pos_c.end.datum == pos_c.start.datum
                 and pos_c.end - pos_c.start > 1
             ):
                 pos_c.start.base += 1

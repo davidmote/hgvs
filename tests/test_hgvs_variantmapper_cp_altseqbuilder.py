@@ -35,10 +35,10 @@ class TestAltSeqBuilder(unittest.TestCase):
         self._run_comparison(hgvsc, expected_sequence)
 
     # TODO - build in support when system can handle variants in 5'utr region
-    # def test_insertion_before_start(self):
-    #     hgvsc = "NM_999999.1:c.-1_1insGGG"
-    #     expected_sequence = "AAAATCAAAGGGATGAAAGCGAAAGCGTTTCGCGCGAAATAGGGG"
-    #     self._run_comparison(hgvsc, expected_sequence)
+    def test_insertion_before_start(self):
+        hgvsc = "NM_999999.1:c.-1_1insGGG"
+        expected_sequence = "AAAATCAAAGGGATGAAAGCGAAAGCGTTTCGCGCGAAATAGGGG"
+        self._run_comparison(hgvsc, expected_sequence)
 
     def test_insertion_start(self):
         hgvsc = "NM_999999.1:c.1_2insAAA"
@@ -56,10 +56,10 @@ class TestAltSeqBuilder(unittest.TestCase):
         self._run_comparison(hgvsc, expected_sequence)
 
     # TODO - build in support when system can handle variants in 3'utr region
-    # def test_insertion_after_end(self):
-    #     hgvsc = "NM_999999.1:c.30_*1insAA"
-    #     expected_sequence = "AAAATCAAAATGAAAGCGAAAGCGTTTCGCGCGAAATAGAAGGGN"
-    #     self._run_comparison(hgvsc, expected_sequence)
+    def test_insertion_after_end(self):
+        hgvsc = "NM_999999.1:c.30_*1insAA"
+        expected_sequence = "AAAATCAAAATGAAAGCGAAAGCGTTTCGCGCGAAATAGAAGGG"
+        self._run_comparison(hgvsc, expected_sequence)
 
     def test_deletion_start(self):
         hgvsc = "NM_999999.1:c.1del"
@@ -119,7 +119,6 @@ class TestAltSeqBuilder(unittest.TestCase):
     #     pass
 
     def _run_comparison(self, hgvsc, expected_sequence):
-
         ac_p = "DUMMY"
         var = self._parser.parse_hgvs_variant(hgvsc)
         transcript_data = RefTranscriptData(hdp=self._datasource, tx_ac=var.ac, pro_ac=ac_p)

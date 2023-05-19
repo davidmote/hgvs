@@ -17,6 +17,7 @@ from bioutils.sequences import reverse_complement, translate_cds
 
 from ..edit import Dup, Inv, NARefAlt, Repeat
 from ..enums import Datum
+from hgvs.exceptions import HGVSUnsupportedOperationError
 
 DBG = False
 
@@ -253,8 +254,19 @@ class AltSeqBuilder(object):
         seq[end:end] = dup_seq
 
         is_frameshift = len(dup_seq) % 3 != 0
-        variant_start_aa = int(math.ceil((self._var_c.posedit.pos.end.base + 1) / 3.0))
-
+        # TODO: determine frameshift taking into account the pos start, pos end DATUM differences
+        if self._var_c.posedit.pos.start.datum == self._var_c.posedit.pos.end.datum:
+            variant_start_aa = int(math.ceil((self._var_c.posedit.pos.end.base + 1) / 3.0))
+        elif self._var_c.posedit.pos.start.datum == Datum.CDS_START:
+            # Calculate the variant_start_aa from the start of the coding sequence
+            cds_len = cds_stop - cds_start + 1
+            variant_start_aa = int(
+                math.ceil((cds_len + self._var_c.posedit.pos.end.base + 1) / 3.0)
+            )
+        else:
+            raise HGVSUnsupportedOperationError(
+                "Interval length measured from different datums is ill-defined"
+            )
         alt_data = AltTranscriptData(
             seq,
             cds_start,
@@ -307,7 +319,10 @@ class AltSeqBuilder(object):
             # list is zero-based; seq pos is 1-based
             if pos.datum == Datum.CDS_START:
                 if pos.base < 0:  # 5' UTR
-                    result = cds_start - 1
+                    if self._var_c.posedit.edit.type in ["dup", "ins", "inv"]:
+                        result = (cds_start - 1) + pos.base
+                    else:
+                        result = cds_start - 1
                 else:  # cds/intron
                     if pos.offset <= 0:
                         result = (cds_start - 1) + pos.base - 1
